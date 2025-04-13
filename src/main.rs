@@ -1,15 +1,11 @@
 use bevy::app::Update;
 use bevy::asset::Assets;
 use bevy::core_pipeline::core_2d::Camera2d;
-use bevy::core_pipeline::core_2d::Camera2dBundle;
-use bevy::ecs::query;
 use bevy::ecs::system::Query;
 use bevy::ecs::system::ResMut;
 use bevy::prelude::*;
 use bevy::render::mesh::Mesh2d;
 use bevy::sprite::ColorMaterial;
-use bevy::sprite::MaterialMesh2dBundle;
-use bevy::text::cosmic_text::rustybuzz::shape;
 use bevy::transform::components::Transform;
 use bevy::{DefaultPlugins, app::Startup, prelude::App};
 
