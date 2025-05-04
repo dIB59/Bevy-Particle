@@ -8,6 +8,8 @@ use bevy::render::mesh::Mesh2d;
 use bevy::sprite::ColorMaterial;
 use bevy::transform::components::Transform;
 use bevy::{DefaultPlugins, app::Startup, prelude::App};
+use rand::prelude::*;
+
 
 fn main() {
     println!("Hello, world!");
@@ -46,16 +48,27 @@ fn setup(
     let material = materials.add(Color::WHITE);
 
     // Spawn the particle with a circular mesh
-    commands.spawn((
+    for _ in 0..100 {
+        commands.spawn(create_particle(circle.clone(), material.clone()));
+    }
+}
+
+type ParticleBundle = (Particle, Position, Mesh2d, MeshMaterial2d<ColorMaterial>, Transform);
+
+fn create_particle(circle: Handle<Mesh>, material: Handle<ColorMaterial>) -> ParticleBundle {
+    let mut rng = rand::rng();
+    let x = rng.random_range(0.0..SCREEN_WIDTH) as f32;
+    let y = rng.random_range(0.0..SCREEN_HEIGHT) as f32;
+    (
         Particle {
-            vel_x: 2.0,
-            vel_y: 1.5,
+            vel_x: 0.1,
+            vel_y: 0.1,
         },
-        Position { x: 0.0, y: 0.0 },
+        Position { x, y },
         Mesh2d(circle),
         MeshMaterial2d(material),
-        Transform::from_xyz(0.0, 0.0, 0.0),
-    ));
+        Transform::from_xyz(x, y, 0.0),
+    )
 }
 
 fn update_position(mut query: Query<(&mut Position, &mut Particle, &mut Transform)>) {
@@ -75,3 +88,4 @@ fn update_position(mut query: Query<(&mut Position, &mut Particle, &mut Transfor
         transform.translation.y = position.y;
     }
 }
+
