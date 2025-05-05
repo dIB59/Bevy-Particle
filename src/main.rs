@@ -23,9 +23,9 @@ fn main() {
 }
 
 const COLLISION_RADIUS: f32 = 10.0;
-const SCREEN_WIDTH: f32 = 800.0;
-const SCREEN_HEIGHT: f32 = 800.0;
-const NUMBER_PARTICLES: u32 = 1000;
+const SCREEN_WIDTH: f32 = 1000.0;
+const SCREEN_HEIGHT: f32 = 1000.0;
+const NUMBER_PARTICLES: u32 = 2000;
 
 #[derive(Component, Default)]
 struct Position {
@@ -37,6 +37,8 @@ struct Position {
 struct Particle {
     vel_x: f32,
     vel_y: f32,
+    mass: u32,
+    radius: u32
 }
 
 fn setup(
@@ -48,29 +50,32 @@ fn setup(
     commands.spawn(Camera2d::default());
 
     // Create a circular mesh and material
-    let circle = meshes.add(Circle::new(5.0)); // radius 5.0
     let material = materials.add(Color::WHITE);
 
     // Spawn the particle with a circular mesh
     for _ in 0..NUMBER_PARTICLES {
-        commands.spawn(create_particle(circle.clone(), material.clone()));
+        commands.spawn(create_particle(&mut meshes, material.clone()));
     }
 }
 
 type ParticleBundle = (Particle, Position, Mesh2d, MeshMaterial2d<ColorMaterial>, Transform);
 
-fn create_particle(circle: Handle<Mesh>, material: Handle<ColorMaterial>) -> ParticleBundle {
+fn create_particle(meshes: &mut ResMut<Assets<Mesh>>, material: Handle<ColorMaterial>) -> ParticleBundle {
     let mut rng = rand::rng();
     let x = rng.random_range(-SCREEN_WIDTH/2.5..SCREEN_WIDTH/2.5) as f32;
     let y = rng.random_range(-SCREEN_HEIGHT/2.5..SCREEN_HEIGHT/2.5) as f32;
+    let mass= rng.random_range(1..5);
     
     (
         Particle {
             vel_x: rng.random_range(-1.0..1.0),
             vel_y: rng.random_range(-1.0..1.0),
+            mass,
+            radius: mass
+        
         },
         Position { x, y },
-        Mesh2d(circle),
+        Mesh2d(meshes.add(Circle::new(mass as f32))),
         MeshMaterial2d(material),
         Transform::from_xyz(x, y, 0.0),
     )
@@ -132,8 +137,8 @@ fn handle_collision_kd_tree(
             let (i, j) = if i < j { (i, j) } else { (j, i) };
             let (left, right) = particles.split_at_mut(j);
             let (pi, pj) = (&mut left[i], &mut right[0]);
-
-            resolve_particle_collision(&mut pi.0, &mut pi.1, &mut pj.0, &mut pj.1, COLLISION_RADIUS);
+            let total_radius = pi.1.radius + pj.1.radius;
+            resolve_particle_collision(&mut pi.0, &mut pi.1, &mut pj.0, &mut pj.1, total_radius as f32);
         }
     }
 }
