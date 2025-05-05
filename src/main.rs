@@ -64,7 +64,7 @@ type ParticleBundle = (Particle, Position, Mesh2d, MeshMaterial2d<ColorMaterial>
 
 /// Returns a color based on mass, interpolating through blue → green → yellow → red.
 fn get_color_based_on_mass(mass: u32) -> Color {
-    let hue = (mass as f32 % 360.0) / 360.0; // Normalize to [0.0, 1.0]
+    let hue = (mass as f32 % 75.0) / 75.0; // Normalize to [0.0, 1.0]
     let saturation = 1.0;
     let value = 1.0;
 
