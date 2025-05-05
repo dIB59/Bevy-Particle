@@ -148,6 +148,7 @@ fn handle_collision_kd_tree(
         }
     }
 }
+
 fn resolve_particle_collision(
     pos_i: &mut Position,
     particle_i: &mut Particle,
