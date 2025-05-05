@@ -10,7 +10,6 @@ use bevy::transform::components::Transform;
 use bevy::window::PresentMode;
 use bevy::{DefaultPlugins, app::Startup, prelude::App};
 use bevy_dev_tools::fps_overlay::FpsOverlayPlugin;
-use bevy_dev_tools::DevToolsPlugin;
 use rand::prelude::*;
 
 
@@ -22,7 +21,7 @@ fn main() {
                 ..default()
             }),
             ..default()
-        }), DevToolsPlugin, FpsOverlayPlugin::default()))
+        }), FpsOverlayPlugin::default()))
         .add_systems(Startup, setup)
         .add_systems(Update, (update_position, handle_collision_kd_tree).chain())
         .run();
