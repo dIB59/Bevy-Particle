@@ -31,11 +31,7 @@ fn main() {
 const COLLISION_RADIUS: f32 = 10.0;
 const SCREEN_WIDTH: f32 = 1000.0;
 const SCREEN_HEIGHT: f32 = 1000.0;
-<<<<<<< HEAD
-const NUMBER_PARTICLES: u32 = 2000;
-=======
 const NUMBER_PARTICLES: u32 = 5000;
->>>>>>> b2301b6 (refactor: update window settings and optimize dev profile in Cargo.toml)
 
 #[derive(Component, Default)]
 struct Position {
