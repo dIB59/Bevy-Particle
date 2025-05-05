@@ -8,6 +8,7 @@ use bevy::render::mesh::Mesh2d;
 use bevy::sprite::ColorMaterial;
 use bevy::transform::components::Transform;
 use bevy::window::PresentMode;
+use bevy::window::WindowMode;
 use bevy::{DefaultPlugins, app::Startup, prelude::App};
 use bevy_dev_tools::fps_overlay::FpsOverlayPlugin;
 use rand::prelude::*;
@@ -17,7 +18,9 @@ fn main() {
     App::new()
         .add_plugins((DefaultPlugins.set(WindowPlugin {
             primary_window: Some(Window {
-                present_mode: PresentMode::Immediate, // Disable VSync
+                title: "Particle Simulation".to_string(),
+                mode: WindowMode::BorderlessFullscreen(MonitorSelection::Primary),
+                present_mode: PresentMode::default(),
                 ..default()
             }),
             ..default()
@@ -27,10 +30,9 @@ fn main() {
         .run();
 }
 
-const COLLISION_RADIUS: f32 = 10.0;
-const SCREEN_WIDTH: f32 = 1000.0;
-const SCREEN_HEIGHT: f32 = 1000.0;
-const NUMBER_PARTICLES: u32 = 4000;
+const SCREEN_WIDTH: f32 = 1900.0;
+const SCREEN_HEIGHT: f32 = 1200.0;
+const NUMBER_PARTICLES: u32 = 10000;
 
 #[derive(Component, Default)]
 struct Position {
@@ -77,7 +79,7 @@ fn create_particle(meshes: &mut ResMut<Assets<Mesh>>, materials: &mut ResMut<Ass
     let mut rng = rand::rng();
     let x = rng.random_range(-SCREEN_WIDTH/2.5..SCREEN_WIDTH/2.5) as f32;
     let y = rng.random_range(-SCREEN_HEIGHT/2.5..SCREEN_HEIGHT/2.5) as f32;
-    let mass= rng.random_range(1..=50);
+    let mass= rng.random_range(1..=5) * 10;
     let radius = mass / 10;
     
     (
@@ -95,21 +97,22 @@ fn create_particle(meshes: &mut ResMut<Assets<Mesh>>, materials: &mut ResMut<Ass
 }
 
 fn update_position(mut query: Query<(&mut Position, &mut Particle, &mut Transform)>) {
-    for (mut position, particle, mut transform) in query.iter_mut() {
+    for (mut position, mut particle, mut transform) in query.iter_mut() {
         position.x += particle.vel_x;
         position.y += particle.vel_y;
 
-        // Wrap around the screen boundaries
+        // Invert the velocity if the particle is outside the screen bounds
         if position.x < -SCREEN_WIDTH / 2.0 {
-            position.x = SCREEN_WIDTH / 2.0; // wrap to the right
+
+            particle.vel_x *= -1.0;
         } else if position.x > SCREEN_WIDTH / 2.0 {
-            position.x = -SCREEN_WIDTH / 2.0; // wrap to the left
+            particle.vel_x *= -1.0;
         }
 
         if position.y < -SCREEN_HEIGHT / 2.0 {
-            position.y = SCREEN_HEIGHT / 2.0; // wrap to the top
+            particle.vel_y *= -1.0;
         } else if position.y > SCREEN_HEIGHT / 2.0 {
-            position.y = -SCREEN_HEIGHT / 2.0; // wrap to the bottom
+            particle.vel_y *= -1.0;
         }
 
         // Update the transform
@@ -133,14 +136,12 @@ fn handle_collision_kd_tree(
 
     for i in 0..particles.len() {
         let mut neighbors = Vec::new();
-        let pos_i_clone = {
-            let (pos, _) = &particles[i];
-            [pos.x, pos.y]
+        let (pos_i_clone, par_i) = {
+            let (pos, par) = &particles[i];
+            ([pos.x, pos.y], par)
         };
 
-        
-
-        search_radius(&tree, pos_i_clone, COLLISION_RADIUS, 0, &mut neighbors);
+        search_radius(&tree, pos_i_clone, (par_i.radius * 2) as f32, 0, &mut neighbors);
 
         for &j in neighbors.iter() {
             if i == j {
