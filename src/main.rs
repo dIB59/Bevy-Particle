@@ -7,6 +7,7 @@ use bevy::prelude::*;
 use bevy::render::mesh::Mesh2d;
 use bevy::sprite::ColorMaterial;
 use bevy::transform::components::Transform;
+use bevy::window::PresentMode;
 use bevy::{DefaultPlugins, app::Startup, prelude::App};
 use bevy_dev_tools::fps_overlay::FpsOverlayPlugin;
 use bevy_dev_tools::DevToolsPlugin;
@@ -14,9 +15,14 @@ use rand::prelude::*;
 
 
 fn main() {
-    println!("Hello, world!");
     App::new()
-        .add_plugins((DefaultPlugins, DevToolsPlugin, FpsOverlayPlugin::default()))
+        .add_plugins((DefaultPlugins.set(WindowPlugin {
+            primary_window: Some(Window {
+                present_mode: PresentMode::Immediate, // Disable VSync
+                ..default()
+            }),
+            ..default()
+        }), DevToolsPlugin, FpsOverlayPlugin::default()))
         .add_systems(Startup, setup)
         .add_systems(Update, (update_position, handle_collision_kd_tree).chain())
         .run();
@@ -25,7 +31,11 @@ fn main() {
 const COLLISION_RADIUS: f32 = 10.0;
 const SCREEN_WIDTH: f32 = 1000.0;
 const SCREEN_HEIGHT: f32 = 1000.0;
+<<<<<<< HEAD
 const NUMBER_PARTICLES: u32 = 2000;
+=======
+const NUMBER_PARTICLES: u32 = 5000;
+>>>>>>> b2301b6 (refactor: update window settings and optimize dev profile in Cargo.toml)
 
 #[derive(Component, Default)]
 struct Position {
