@@ -31,7 +31,7 @@ fn main() {
 const COLLISION_RADIUS: f32 = 10.0;
 const SCREEN_WIDTH: f32 = 1000.0;
 const SCREEN_HEIGHT: f32 = 1000.0;
-const NUMBER_PARTICLES: u32 = 5000;
+const NUMBER_PARTICLES: u32 = 4000;
 
 #[derive(Component, Default)]
 struct Position {
@@ -55,34 +55,42 @@ fn setup(
     // Camera
     commands.spawn(Camera2d::default());
 
-    // Create a circular mesh and material
-    let material = materials.add(Color::WHITE);
-
     // Spawn the particle with a circular mesh
     for _ in 0..NUMBER_PARTICLES {
-        commands.spawn(create_particle(&mut meshes, material.clone()));
+        commands.spawn(create_particle(&mut meshes, &mut materials));
     }
 }
 
 type ParticleBundle = (Particle, Position, Mesh2d, MeshMaterial2d<ColorMaterial>, Transform);
 
-fn create_particle(meshes: &mut ResMut<Assets<Mesh>>, material: Handle<ColorMaterial>) -> ParticleBundle {
+/// Returns a color based on mass, interpolating through blue → green → yellow → red.
+fn get_color_based_on_mass(mass: u32) -> Color {
+    let hue = (mass as f32 % 360.0) / 360.0; // Normalize to [0.0, 1.0]
+    let saturation = 1.0;
+    let value = 1.0;
+
+    Color::hsv(hue * 360.0, saturation, value)
+}
+
+
+
+fn create_particle(meshes: &mut ResMut<Assets<Mesh>>, materials: &mut ResMut<Assets<ColorMaterial>>) -> ParticleBundle {
     let mut rng = rand::rng();
     let x = rng.random_range(-SCREEN_WIDTH/2.5..SCREEN_WIDTH/2.5) as f32;
     let y = rng.random_range(-SCREEN_HEIGHT/2.5..SCREEN_HEIGHT/2.5) as f32;
-    let mass= rng.random_range(1..5);
+    let mass= rng.random_range(1..=50);
+    let radius = mass / 10;
     
     (
         Particle {
             vel_x: rng.random_range(-0.5..0.5),
             vel_y: rng.random_range(-0.5..0.5),
             mass,
-            radius: mass
-        
+            radius,
         },
         Position { x, y },
-        Mesh2d(meshes.add(Circle::new(mass as f32))),
-        MeshMaterial2d(material),
+        Mesh2d(meshes.add(Circle::new(radius as f32))),
+        MeshMaterial2d(materials.add(get_color_based_on_mass(mass))),
         Transform::from_xyz(x, y, 0.0),
     )
 }
