@@ -74,8 +74,8 @@ fn create_particle(meshes: &mut ResMut<Assets<Mesh>>, material: Handle<ColorMate
     
     (
         Particle {
-            vel_x: rng.random_range(-1.0..1.0),
-            vel_y: rng.random_range(-1.0..1.0),
+            vel_x: rng.random_range(-0.5..0.5),
+            vel_y: rng.random_range(-0.5..0.5),
             mass,
             radius: mass
         
@@ -148,8 +148,6 @@ fn handle_collision_kd_tree(
         }
     }
 }
-
-
 fn resolve_particle_collision(
     pos_i: &mut Position,
     particle_i: &mut Particle,
@@ -166,32 +164,37 @@ fn resolve_particle_collision(
         let nx = dx / dist;
         let ny = dy / dist;
 
-        // Calculate how much they overlap
+        let mass_i = particle_i.mass as f32;
+        let mass_j = particle_j.mass as f32;
+        let total_mass = mass_i + mass_j;
+
+        // Calculate overlap
         let overlap = radius - dist;
 
-        // Push particles apart equally (assume equal mass)
-        let separation = overlap / 2.0;
-        pos_i.x += nx * separation;
-        pos_i.y += ny * separation;
-        pos_j.x -= nx * separation;
-        pos_j.y -= ny * separation;
+        // Push particles apart based on mass ratio
+        pos_i.x += nx * overlap * (mass_j / total_mass);
+        pos_i.y += ny * overlap * (mass_j / total_mass);
+        pos_j.x -= nx * overlap * (mass_i / total_mass);
+        pos_j.y -= ny * overlap * (mass_i / total_mass);
 
         // Relative velocity
         let dvx = particle_i.vel_x - particle_j.vel_x;
         let dvy = particle_i.vel_y - particle_j.vel_y;
 
-        // Velocity along the normal
+        // Velocity along the collision normal
         let vn = dvx * nx + dvy * ny;
 
         if vn < 0.0 {
-            let impulse = 2.0 * vn / 2.0; // equal mass
-            particle_i.vel_x -= impulse * nx;
-            particle_i.vel_y -= impulse * ny;
-            particle_j.vel_x += impulse * nx;
-            particle_j.vel_y += impulse * ny;
+            // Elastic collision impulse with mass consideration
+            let impulse = (2.0 * vn) / total_mass;
+            particle_i.vel_x -= impulse * mass_j * nx;
+            particle_i.vel_y -= impulse * mass_j * ny;
+            particle_j.vel_x += impulse * mass_i * nx;
+            particle_j.vel_y += impulse * mass_i * ny;
         }
     }
 }
+
 
 #[derive(Debug)]
 struct KdNode {
