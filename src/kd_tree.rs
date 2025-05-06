@@ -1,11 +1,9 @@
 use crate::particle;
-use crate::particle::Position;
 use crate::particle::Particle;
+use crate::particle::Position;
 use bevy::prelude::*;
 
-pub fn handle_collision_kd_tree(
-    mut query: Query<(&mut Position, &mut Particle)>
-) {
+pub fn handle_collision_kd_tree(mut query: Query<(&mut Position, &mut Particle)>) {
     let mut points: Vec<(usize, [f32; 2])> = query
         .iter()
         .enumerate()
@@ -22,7 +20,13 @@ pub fn handle_collision_kd_tree(
             ([pos.x, pos.y], par)
         };
 
-        search_radius(&tree, pos_i_clone, (par_i.radius * 2) as f32, 0, &mut neighbors);
+        search_radius(
+            &tree,
+            pos_i_clone,
+            (par_i.radius * 2) as f32,
+            0,
+            &mut neighbors,
+        );
 
         for &j in neighbors.iter() {
             if i == j {
@@ -33,7 +37,13 @@ pub fn handle_collision_kd_tree(
             let (left, right) = particles.split_at_mut(j);
             let (pi, pj) = (&mut left[i], &mut right[0]);
             let total_radius = pi.1.radius + pj.1.radius;
-            particle::resolve_particle_collision(&mut pi.0, &mut pi.1, &mut pj.0, &mut pj.1, total_radius as f32);
+            particle::resolve_particle_collision(
+                &mut pi.0,
+                &mut pi.1,
+                &mut pj.0,
+                &mut pj.1,
+                total_radius as f32,
+            );
         }
     }
 }
@@ -91,4 +101,3 @@ fn search_radius(
         }
     }
 }
-
