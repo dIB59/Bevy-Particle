@@ -1,7 +1,6 @@
-use bevy::{
-    prelude::*,
-    window::{Monitor, PrimaryWindow},
-};
+use bevy::
+    prelude::*
+;
 use rand::prelude::*;
 
 pub type ParticleBundle = (
