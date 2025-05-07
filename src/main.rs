@@ -12,6 +12,7 @@ use bevy_dev_tools::fps_overlay::FpsOverlayPlugin;
 
 mod kd_tree;
 mod particle;
+mod quad_tree;
 
 fn main() {
     App::new()
@@ -30,12 +31,13 @@ fn main() {
         .add_systems(Startup, setup)
         .add_systems(
             Update,
-            (kd_tree::handle_collision_kd_tree, particle::update_position).chain(),
+            (kd_tree::handle_collision_kd_tree, quad_tree::handle_quadtree_gravity, particle::update_position).chain(),
         )
         .run();
 }
 
-const NUMBER_PARTICLES: u32 = 10000;
+
+const NUMBER_PARTICLES: u32 = 5000;
 
 fn setup(
     mut commands: Commands,
@@ -45,6 +47,29 @@ fn setup(
 ) {
     // Camera
     commands.spawn(Camera2d::default());
+    commands.insert_resource(quad_tree::Quadtree::new(1.0, 1.0)); // Adjust theta/epsilon as needed
+
+    // Spawn a massive particle at the center of the screen
+    commands.spawn(particle::create_massive_particle(
+        &mut meshes,
+        &mut materials,
+        windows,
+        particle::Position {
+            x: 0.0,
+            y: 0.0,
+        },
+    ));
+
+    commands.spawn(particle::create_massive_particle(
+        &mut meshes,
+        &mut materials,
+        windows,
+        particle::Position {
+            x: 1820.0 / 2.0,
+            y: 1080.0 / 2.0,
+        },
+    ));
+
 
     // Spawn the particle with a circular mesh
     for _ in 0..NUMBER_PARTICLES {

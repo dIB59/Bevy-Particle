@@ -14,7 +14,7 @@ pub type ParticleBundle = (
 const SCREEN_WIDTH: f32 = 1900.0;
 const SCREEN_HEIGHT: f32 = 1200.0;
 
-#[derive(Component, Default)]
+#[derive(Component, Default, Clone)]
 pub struct Particle {
     pub vel_x: f32,
     pub vel_y: f32,
@@ -22,7 +22,7 @@ pub struct Particle {
     pub radius: u32,
 }
 
-#[derive(Component, Default)]
+#[derive(Component, Default, Clone)]
 pub struct Position {
     pub x: f32,
     pub y: f32,
@@ -46,15 +46,15 @@ pub fn create_particle(
     let width = window.width();
     let height = window.height();
     let mut rng = rand::rng();
-    let x = rng.random_range(-width / 2.5..width / 2.5) as f32;
-    let y = rng.random_range(-height / 2.5..height / 2.5) as f32;
+    let x = rng.random_range(-width / 2.0..width / 2.0) as f32;
+    let y = rng.random_range(-height / 2.0..height / 2.0) as f32;
     let mass = rng.random_range(1..=5) * 10;
     let radius = mass / 10;
 
     (
         Particle {
-            vel_x: rng.random_range(-0.5..0.5),
-            vel_y: rng.random_range(-0.5..0.5),
+            vel_x: rng.random_range(-0.5..0.5) + 1.0 * 100.0 / mass as f32,
+            vel_y: rng.random_range(-0.5..0.5) + 1.0 * 100.0 / mass as f32,
             mass,
             radius,
         },
@@ -62,6 +62,28 @@ pub fn create_particle(
         Mesh2d(meshes.add(Circle::new(radius as f32))),
         MeshMaterial2d(materials.add(get_color_based_on_mass(mass))),
         Transform::from_xyz(x, y, 0.0),
+    )
+}
+
+pub fn create_massive_particle(
+    meshes: &mut ResMut<Assets<Mesh>>,
+    materials: &mut ResMut<Assets<ColorMaterial>>,
+    windows: Query<&Window>,
+    position: Position
+) -> ParticleBundle {
+    let middle = Vec2::new(SCREEN_WIDTH / 2.0, SCREEN_HEIGHT / 2.0);
+
+    (
+        Particle {
+            vel_x: 0.0,
+            vel_y: 0.0,
+            mass: 10000,
+            radius: 100,
+        },
+        position,
+        Mesh2d(meshes.add(Circle::new(100.0))),
+        MeshMaterial2d(materials.add(Color::srgb(0.5, 0.5, 0.5))),
+        Transform::from_xyz(middle.x, middle.y, 0.0),
     )
 }
 
@@ -86,6 +108,10 @@ pub fn update_position(mut query: Query<(&mut Position, &mut Particle, &mut Tran
         // Update the transform
         transform.translation.x = position.x;
         transform.translation.y = position.y;
+
+        // damp the velocity
+        particle.vel_x *= 0.99;
+        particle.vel_y *= 0.99;
     }
 }
 
