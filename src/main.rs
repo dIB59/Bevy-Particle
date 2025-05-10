@@ -13,6 +13,8 @@ use bevy_dev_tools::fps_overlay::FpsOverlayPlugin;
 mod kd_tree;
 mod particle;
 mod quad_tree;
+mod simulation;
+mod controls;
 
 fn main() {
     App::new()
@@ -29,6 +31,7 @@ fn main() {
             FpsOverlayPlugin::default(),
         ))
         .add_systems(Startup, setup)
+        .add_systems(Update, (controls::camera_pan_keyboard, controls::camera_zoom).chain())
         .add_systems(
             Update,
             (kd_tree::handle_collision_kd_tree, quad_tree::handle_quadtree_gravity, particle::update_position).chain(),
@@ -37,7 +40,7 @@ fn main() {
 }
 
 
-const NUMBER_PARTICLES: u32 = 5000;
+const NUMBER_PARTICLES: u32 = 10000;
 
 fn setup(
     mut commands: Commands,

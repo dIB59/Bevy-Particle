@@ -2,6 +2,14 @@ use bevy::
     prelude::*
 ;
 use rand::prelude::*;
+use crate::simulation::SCREEN_HEIGHT;
+use crate::simulation::SCREEN_WIDTH;    
+
+pub trait ApplyForce {
+    
+    fn apply_force(&mut self, force: Vec2);
+    
+}
 
 pub type ParticleBundle = (
     Particle,
@@ -10,9 +18,6 @@ pub type ParticleBundle = (
     MeshMaterial2d<ColorMaterial>,
     Transform,
 );
-
-const SCREEN_WIDTH: f32 = 1900.0;
-const SCREEN_HEIGHT: f32 = 1200.0;
 
 #[derive(Component, Default, Clone)]
 pub struct Particle {
@@ -134,15 +139,6 @@ pub fn resolve_particle_collision(
         let mass_i = particle_i.mass as f32;
         let mass_j = particle_j.mass as f32;
         let total_mass = mass_i + mass_j;
-
-        // Calculate overlap
-        let overlap = radius - dist;
-
-        // Push particles apart based on mass ratio
-        pos_i.x += nx * overlap * (mass_j / total_mass);
-        pos_i.y += ny * overlap * (mass_j / total_mass);
-        pos_j.x -= nx * overlap * (mass_i / total_mass);
-        pos_j.y -= ny * overlap * (mass_i / total_mass);
 
         // Relative velocity
         let dvx = particle_i.vel_x - particle_j.vel_x;
