@@ -214,7 +214,7 @@ pub fn handle_quadtree_gravity(
         let force = quadtree.acc(pos_vec);
 
         // Simple acceleration assuming 1 unit time step
-        particle.vel_x += force.x / 500.0; // Scale down the force for better simulation
-        particle.vel_y += force.y / 500.0; // Scale down the force for better simulation
+        particle.vel_x += force.x / 100.0; // Scale down the force for better simulation
+        particle.vel_y += force.y / 100.0; // Scale down the force for better simulation
     }
 }
