@@ -1,4 +1,7 @@
-Here's an improved version of the `README.md` with OS-specific setup instructions for **Linux**, **macOS**, and **Windows**. This version is still beginner-friendly but more thorough:
+
+https://github.com/user-attachments/assets/43455f25-dbb9-47d3-af37-93f8f3056c5c
+Uploading speedup.mp4…
+
 
 ---
 
