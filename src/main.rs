@@ -40,7 +40,6 @@ fn main() {
 }
 
 
-const NUMBER_PARTICLES: u32 = 10000;
 
 fn setup(
     mut commands: Commands,
@@ -50,36 +49,13 @@ fn setup(
 ) {
     // Camera
     commands.spawn(Camera2d::default());
-    commands.insert_resource(quad_tree::Quadtree::new(1.0, 1.0)); // Adjust theta/epsilon as needed
-
-    // Spawn a massive particle at the center of the screen
-    commands.spawn(particle::create_massive_particle(
-        &mut meshes,
-        &mut materials,
-        windows,
-        particle::Position {
-            x: 0.0,
-            y: 0.0,
-        },
-    ));
-
-    commands.spawn(particle::create_massive_particle(
-        &mut meshes,
-        &mut materials,
-        windows,
-        particle::Position {
-            x: 1820.0 / 2.0,
-            y: 1080.0 / 2.0,
-        },
-    ));
-
+    commands.insert_resource(quad_tree::Quadtree::new(0.50, 0.3)); // Adjust theta/epsilon as needed
 
     // Spawn the particle with a circular mesh
-    for _ in 0..NUMBER_PARTICLES {
+    for _ in 0..simulation::NUMBER_PARTICLES {
         commands.spawn(particle::create_particle(
             &mut meshes,
-            &mut materials,
-            windows,
+            &mut materials
         ));
     }
 }

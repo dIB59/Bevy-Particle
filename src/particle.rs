@@ -16,7 +16,7 @@ pub type ParticleBundle = (
     Position,
     Mesh2d,
     MeshMaterial2d<ColorMaterial>,
-    Transform,
+    Transform
 );
 
 #[derive(Component, Default, Clone)]
@@ -24,13 +24,13 @@ pub struct Particle {
     pub vel_x: f32,
     pub vel_y: f32,
     pub mass: u32,
-    pub radius: u32,
+    pub radius: u32
 }
 
 #[derive(Component, Default, Clone)]
 pub struct Position {
     pub x: f32,
-    pub y: f32,
+    pub y: f32
 }
 
 /// Returns a color based on mass, interpolating through blue → green → yellow → red.
@@ -44,22 +44,21 @@ fn get_color_based_on_mass(mass: u32) -> Color {
 
 pub fn create_particle(
     meshes: &mut ResMut<Assets<Mesh>>,
-    materials: &mut ResMut<Assets<ColorMaterial>>,
-    windows: Query<&Window>,
+    materials: &mut ResMut<Assets<ColorMaterial>>
 ) -> ParticleBundle {
-    let window = windows.single().unwrap(); // Get window
-    let width = window.width();
-    let height = window.height();
     let mut rng = rand::rng();
-    let x = rng.random_range(-width / 2.0..width / 2.0) as f32;
-    let y = rng.random_range(-height / 2.0..height / 2.0) as f32;
+    let x = rng.random_range(-SCREEN_WIDTH / 2.0..SCREEN_WIDTH / 2.0) as f32;
+    let y = rng.random_range(-SCREEN_HEIGHT / 2.0..SCREEN_HEIGHT / 2.0) as f32;
     let mass = rng.random_range(1..=5) * 10;
-    let radius = mass / 10;
+    let radius = mass / 10 ;
+    rng.next_u64();
+    let vel_x = rng.random_range(-0.5..0.5) + 1.0 * 100.0 / mass as f32;
+    let vel_y = rng.random_range(-0.5..0.5) + 1.0 * 100.0 / mass as f32;
 
     (
         Particle {
-            vel_x: rng.random_range(-0.5..0.5) + 1.0 * 100.0 / mass as f32,
-            vel_y: rng.random_range(-0.5..0.5) + 1.0 * 100.0 / mass as f32,
+            vel_x,
+            vel_y,
             mass,
             radius,
         },
@@ -67,28 +66,6 @@ pub fn create_particle(
         Mesh2d(meshes.add(Circle::new(radius as f32))),
         MeshMaterial2d(materials.add(get_color_based_on_mass(mass))),
         Transform::from_xyz(x, y, 0.0),
-    )
-}
-
-pub fn create_massive_particle(
-    meshes: &mut ResMut<Assets<Mesh>>,
-    materials: &mut ResMut<Assets<ColorMaterial>>,
-    windows: Query<&Window>,
-    position: Position
-) -> ParticleBundle {
-    let middle = Vec2::new(SCREEN_WIDTH / 2.0, SCREEN_HEIGHT / 2.0);
-
-    (
-        Particle {
-            vel_x: 0.0,
-            vel_y: 0.0,
-            mass: 10000,
-            radius: 100,
-        },
-        position,
-        Mesh2d(meshes.add(Circle::new(100.0))),
-        MeshMaterial2d(materials.add(Color::srgb(0.5, 0.5, 0.5))),
-        Transform::from_xyz(middle.x, middle.y, 0.0),
     )
 }
 

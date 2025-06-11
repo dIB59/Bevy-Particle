@@ -12,7 +12,7 @@ fn insert_particles_benchmark(c: &mut Criterion) {
     // Set up the benchmark for inserting particles into the quadtree
     //Create 10000 random particles
     let mut rand = rand::rng();
-    let particles = (0..10_000)
+    let particles = (0..100_000)
         .map(|_| {
             let x = rand.random_range(-500.0..500.0);
             let y = rand.random_range(-500.0..500.0);
