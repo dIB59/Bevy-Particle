@@ -1,7 +1,3 @@
-Here's an improved version of the `README.md` with OS-specific setup instructions for **Linux**, **macOS**, and **Windows**. This version is still beginner-friendly but more thorough:
-
----
-
 # Bevy Game Project
 
 This is a simple game/app built with [Bevy](https://bevyengine.org/), a modern, data-driven game engine written in Rust. This guide will help **absolute beginners** set up and run the project on **Windows**, **macOS**, and **Linux**.
@@ -94,22 +90,6 @@ If you're **cloning an existing project**:
 git clone https://github.com/yourusername/bevy-project.git
 cd bevy-project
 ```
-
-If you're **starting from scratch**:
-
-```bash
-cargo new bevy-project
-cd bevy-project
-```
-
-Then add Bevy to your dependencies in `Cargo.toml`:
-
-```toml
-[dependencies]
-bevy = "0.13"
-```
-
-Check [crates.io](https://crates.io/crates/bevy) for the latest version.
 
 ---
 
