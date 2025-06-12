@@ -5,13 +5,16 @@ This is a simple game/app built with [Bevy](https://bevyengine.org/), a modern, 
 ---
 ## 🎥 Demo Video
 
-📽️ [Watch BevyParticle.mp4](BevyParticle.mp4)
+https://github.com/user-attachments/assets/e82d1f70-7a8a-4521-93f5-72d43cfcb25f
 
 ## Prerequisites
 
 ### 1. **Install Rust**
 
-Rust includes `cargo`, the package manager used to build and run the project.
+Rust includes `cargo`, the package manager used to build and run the
+
+
+ project.
 
 Run the following command in your terminal (PowerShell, Terminal, or Bash):
 
