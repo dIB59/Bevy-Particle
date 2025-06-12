@@ -5,7 +5,7 @@ This is a simple game/app built with [Bevy](https://bevyengine.org/), a modern, 
 ---
 ## 🎥 Demo Video
 
-📽️ [Watch BevyParticle.mp4](BevyParticle.mp4)
+📽️ [Watch BevyParticle.mp4](BevyParticle.mov)
 
 ## Prerequisites
 
