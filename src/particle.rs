@@ -2,6 +2,7 @@ use bevy::
     prelude::*
 ;
 use rand::prelude::*;
+use crate::simulation;
 use crate::simulation::SCREEN_HEIGHT;
 use crate::simulation::SCREEN_WIDTH;    
 
@@ -44,22 +45,43 @@ fn get_color_based_on_mass(mass: u32) -> Color {
 
 pub fn create_particle(
     meshes: &mut ResMut<Assets<Mesh>>,
-    materials: &mut ResMut<Assets<ColorMaterial>>
+    materials: &mut ResMut<Assets<ColorMaterial>>,
 ) -> ParticleBundle {
+    
     let mut rng = rand::rng();
     let x = rng.random_range(-SCREEN_WIDTH / 2.0..SCREEN_WIDTH / 2.0) as f32;
     let y = rng.random_range(-SCREEN_HEIGHT / 2.0..SCREEN_HEIGHT / 2.0) as f32;
-    let mass = rng.random_range(1..=5) * 10;
-    let radius = mass / 10 ;
-    rng.next_u64();
-    let vel_x = rng.random_range(-0.5..0.5) + 1.0 * 100.0 / mass as f32;
-    let vel_y = rng.random_range(-0.5..0.5) + 1.0 * 100.0 / mass as f32;
+
+    let distance_from_center = (x * x + y * y).sqrt();
+    let max_distance_from_center = ((SCREEN_WIDTH * SCREEN_WIDTH + SCREEN_HEIGHT * SCREEN_HEIGHT).sqrt()) / 2.0;
+    let distance_ratio = (distance_from_center / max_distance_from_center).clamp(0.0, 1.0);
+    let mass = ((((simulation::MAX_PARTICLE_MASS - simulation::MIN_PARTICLE_MASS) * 10.0) as f32 * (1.0 - distance_ratio)).round() + simulation::MIN_PARTICLE_MASS) as u32;
+    let radius = mass / 10;
+
+    let distance_sq = x * x + y * y;
+
+    let (vel_x, vel_y, mass_alter) = if distance_sq > simulation::ORBIT_VELOCITY_CUTOFF_DISTANCE_SQ {
+        // Orbiting: velocity perpendicular to position vector
+        let mut dx = -y;
+        let mut dy = x;
+
+        let len = (dx * dx + dy * dy).sqrt();
+        dx /= len;
+        dy /= len;
+
+        let speed = 50.0 / (mass as f32).sqrt();
+        (dx * speed, dy * speed, mass)
+    } else {
+        // Near center: no velocity
+        let mass_alter = mass * 5;
+        (0.0, 0.0, mass_alter)
+    };
 
     (
         Particle {
             vel_x,
             vel_y,
-            mass,
+            mass: mass_alter,
             radius,
         },
         Position { x, y },
@@ -92,8 +114,8 @@ pub fn update_position(mut query: Query<(&mut Position, &mut Particle, &mut Tran
         transform.translation.y = position.y;
 
         // damp the velocity
-        particle.vel_x *= 0.99;
-        particle.vel_y *= 0.99;
+        particle.vel_x *= 0.999;
+        particle.vel_y *= 0.999;
     }
 }
 
