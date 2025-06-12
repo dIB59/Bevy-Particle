@@ -3,6 +3,9 @@
 This is a simple game/app built with [Bevy](https://bevyengine.org/), a modern, data-driven game engine written in Rust. This guide will help **absolute beginners** set up and run the project on **Windows**, **macOS**, and **Linux**.
 
 ---
+## 🎥 Demo Video
+
+📽️ [Watch BevyParticle.mp4](BevyParticle.mp4)
 
 ## Prerequisites
 
@@ -84,10 +87,8 @@ We recommend [Visual Studio Code](https://code.visualstudio.com/) with the "Rust
 
 ## 📦 Setting Up the Project
 
-If you're **cloning an existing project**:
-
 ```bash
-git clone https://github.com/yourusername/bevy-project.git
+git clone https://github.com/dIB59/Bevy-Particle.git
 cd bevy-project
 ```
 
